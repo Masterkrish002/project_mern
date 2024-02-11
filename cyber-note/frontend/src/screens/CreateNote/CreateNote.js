@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Card, Form } from "react-bootstrap";
+import { Button, Card, Form, Badge } from "react-bootstrap";
 import MainScreen from "../../components/MainScreen";
 import ReactMarkdown from "react-markdown";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +32,9 @@ const CreateNote = () => {
 
     resetHandler();
     navigate("/mynotes");
+  };
+  const wordCount = () => {
+    return content.trim().split(/\s+/).filter(Boolean).length;
   };
 
   return (
@@ -78,14 +81,19 @@ const CreateNote = () => {
                 onChange={(e) => setCategory(e.target.value)}
               />
             </Form.Group>
-            {loading && <Loading size={50} />}
-            <Button type="submit" variant="primary">
-              Create Note
-            </Button>
-            <Button className="mx-2" onClick={resetHandler} variant="danger">
-              Reset Fields
-            </Button>
-          </Form>
+            <div className="d-flex justify-content-between align-items-center">
+            <Badge variant="secondary">Words: {wordCount()}</Badge>
+            <div>
+              {loading && <Loading size={20} />}
+              <Button type="submit" variant="primary" className="mx-2">
+                Create Note
+              </Button>
+              <Button variant="danger" onClick={resetHandler}>
+                Reset Fields
+              </Button>
+            </div>
+          </div>
+        </Form>
           <Card.Footer className="text-muted">
             Creating on - {new Date().toLocaleDateString()}
           </Card.Footer>

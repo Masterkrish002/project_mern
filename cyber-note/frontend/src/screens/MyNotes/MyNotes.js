@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Accordion, Badge, Button, Card } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import MainScreen from "../../components/MainScreen";
@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteNoteAction, listNotes } from "../../actions/notesActions";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
+import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toastify
+import "./MyNotes.css"; // Import your CSS file
 
 const MyNotes = ({ search }) => {
   const dispatch = useDispatch();
@@ -30,9 +33,8 @@ const MyNotes = ({ search }) => {
   } = noteDelete;
 
   const deleteHandler = (id) => {
-    if (window.confirm("Are you sure?")) {
-      dispatch(deleteNoteAction(id));
-    }
+    toast.success("Note deleted successfully"); // Show success message
+    dispatch(deleteNoteAction(id));
   };
 
   useEffect(() => {
@@ -47,54 +49,54 @@ const MyNotes = ({ search }) => {
     userInfo,
     successUpdate,
     successDelete,
-  ]);
+  ]); 
 
   return (
     <div>
       <MainScreen title={`Welcome ${userInfo?.name?.split(" ")[0]}...`}>
         <Link to="/createnote">
-          <Button style={{ marginLeft: 10, marginBottom: 6 }} size="lg">
-            Create a Note
-          </Button>
+        <Button style={{ marginLeft: 10, marginBottom: 20 }} size="lg">
+      Create a Note
+    </Button>
         </Link>
+        <ToastContainer /> {/* Add ToastContainer */}
         {errorDelete && (
           <ErrorMessage variant="danger">{errorDelete}</ErrorMessage>
         )}
         {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
         {loading && <Loading />}
+        <div className="notes-container">
         {notes
           ?.reverse()
-          .filter((filterdNote) =>
-            filterdNote.title.toLowerCase().includes(search.toLowerCase())
+          .filter((filteredNote) =>
+            filteredNote.title.toLowerCase().includes(search.toLowerCase())
           )
           .map((note) => (
-            <Accordion defaultActiveKey="0">
-              <Card style={{ margin: 10 }}>
-                <Card.Header style={{ display: "flex"}}>
-                  <span
-                    style={{
-                      color: "black",
-                      textDecoration: "none",
-                      flex: 1,
-                      cursor: "pointer",
-                      alignSelf: "center",
-                      fontSize: 18,
-                      fontWeight: "bold"
-                    }}
-                  >
-                    <Accordion.Header>{note.title}</Accordion.Header>
-                  </span>
-                  <div>
+            <Accordion key={note._id} defaultActiveKey="0">
+              <Card className="note-card">
+                <Card.Header className="card-header">
+                  <span className="card-title">{note.title}</span>
+                  <div className="card-info">
+                    <span className="category">
+                      <Badge pill bg="info">{note.category}</Badge>
+                    </span>
+                    <span className="created-date">
+                      Created On: {note.createdAt.substring(0, 10)}
+                    </span>
+                  </div>
+                  <div className="card-buttons">
                     <Link to={`/note/${note._id}`}>
-                      <Button>Edit</Button>
+                      <Button className="edit-button">Edit</Button>
                     </Link>
                     <Button
-                      variant="danger"
-                      className="mx-2"
-                      onClick={() => deleteHandler(note._id)}
-                    >
-                      Delete
-                    </Button>
+                variant="danger"
+                className="delete-button"
+                style={{ marginLeft: '10px' }}  // Inline style to add left margin
+                onClick={() => deleteHandler(note._id)}
+              >
+                Delete
+              </Button>
+
                   </div>
                 </Card.Header>
                 <Accordion.Body>
@@ -115,6 +117,7 @@ const MyNotes = ({ search }) => {
               </Card>
             </Accordion>
           ))}
+          </div>
       </MainScreen>
     </div>
   );
